@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Controle de Veículos - Comissão de Seguro</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #111a2e;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --text: #e5e7eb;
+      --text-strong: #f8fafc;
+      --border: #1f2a44;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px;
+      background: linear-gradient(135deg, #0b1220 0%, #0e172a 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    h1, h2 { color: var(--text-strong); margin: 0 0 8px; }
+    .sub { color: var(--muted); margin: 0 0 20px; font-size: 0.95rem; }
+    .container {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; gap: 16px;
+    }
+    .card {
+      background: rgba(17, 26, 46, 0.7);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .row { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-8 { grid-column: span 8; }
+    .col-12 { grid-column: span 12; }
+    label { display:block; font-weight: 600; margin-bottom: 6px; color: var(--text-strong); }
+    input[type="text"], select, textarea {
+      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+      background: #0e1629; color: var(--text); outline: none;
+    }
+    textarea { min-height: 42px; resize: vertical; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    button, .link-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border); background: #0f1a31; color: var(--text);
+      padding: 10px 14px; border-radius: 12px; cursor: pointer; text-decoration: none; font-weight: 600;
+      transition: transform .05s ease, box-shadow .2s ease, background .2s ease;
+    }
+    button:hover, .link-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
+    .primary { background: linear-gradient(180deg, #2563eb, #1d4ed8); border-color: #1e3a8a; }
+    .success { background: linear-gradient(180deg, #22c55e, #16a34a); border-color: #166534; }
+    .danger  { background: linear-gradient(180deg, #ef4444, #dc2626); border-color: #7f1d1d; }
+    .ghost { background: #0f1a31; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid var(--border); padding: 10px 8px; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 700; font-size: .9rem; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    .empty { color: var(--muted); font-style: italic; padding: 12px 0; }
+    .badge {
+      display: inline-block; padding: 3px 8px; border-radius: 999px; background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.35);
+      color: #cfe0ff; font-size: .75rem;
+    }
+    @media (max-width: 780px) {
+      .col-4, .col-6, .col-8, .col-12 { grid-column: span 12; }
+      .actions { gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="card">
+      <h1>Controle de Veículos – Comissão de Seguro</h1>
+      <p class="sub">Registre veículos relacionados a comissão de seguro. Esses lançamentos serão exportados como uma <strong>aba</strong> no Excel ao finalizar o turno pela <em>Interface</em>.</p>
+      <div id="userInfo" class="sub"></div>
+    </header>
+
+    <section class="card">
+      <h2>Novo Lançamento</h2>
+      <div class="row" style="margin-top:10px">
+        <div class="col-4">
+          <label for="setor">Setor</label>
+          <select id="setor">
+            <option value="Comissão de Seguro">Comissão de Seguro</option>
+            <option value="Industrialização">Industrialização</option>
+            <option value="Portaria">Portaria</option>
+          </select>
+        </div>
+        <div class="col-4">
+          <label for="veiculo">Veículo (placa/chassi)</label>
+          <input type="text" id="veiculo" placeholder="Ex.: ABC1D23 ou 9BWZZZ377VT004251" />
+        </div>
+        <div class="col-4">
+          <label for="obs">Observações</label>
+          <input type="text" id="obs" placeholder="Opcional" />
+        </div>
+        <div class="col-12 actions" style="margin-top:8px">
+          <button class="primary" id="btnAdd">
+            <i data-feather="plus-circle"></i>
+            Adicionar registro
+          </button>
+          <button class="ghost" id="btnClear">
+            <i data-feather="x-circle"></i>
+            Limpar campos
+          </button>
+          <a class="link-btn ghost" href="interface_principal.html">
+            <i data-feather="arrow-left-circle"></i>
+            Voltar ao menu
+          </a>
+          <a class="link-btn success" href="interface_principal.html">
+            <i data-feather="check-circle"></i>
+            Finalizar turno (no menu)
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Lançamentos</h2>
+      <div id="listaVazia" class="empty">Nenhum lançamento até o momento.</div>
+      <div style="overflow:auto">
+        <table id="tabela">
+          <thead>
+            <tr>
+              <th>Setor</th>
+              <th>Turno</th>
+              <th>Controlador de acesso</th>
+              <th>Veículo (placa/chassi)</th>
+              <th>Observações</th>
+              <th>Data e Hora</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script>
+    const STORAGE_KEY = 'tabelaComissaoSeguro';
+
+    function getUserInfo() {
+      const usuario = localStorage.getItem('usuario') || '';
+      const registro = localStorage.getItem('registro') || '';
+      const turno = localStorage.getItem('turno') || '';
+      return { usuario, registro, turno };
+    }
+
+    function setUserBanner() {
+      const { usuario, registro, turno } = getUserInfo();
+      const el = document.getElementById('userInfo');
+      if (!usuario || !turno) {
+        el.innerHTML = '<span class="badge">Atenção</span> Faça login pelo <em>index.html</em> para vincular usuário e turno.';
+      } else {
+        el.innerHTML = \`<span class="badge">Usuário</span> \${usuario} / \${registro}  &nbsp; • &nbsp; <span class="badge">Turno</span> \${turno}\`;
+      }
+    }
+
+    function loadArr() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+      catch { return []; }
+    }
+    function saveArr(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+    function clearFields() {
+      document.getElementById('veiculo').value = '';
+      document.getElementById('obs').value = '';
+      // mantém o setor selecionado
+      document.getElementById('veiculo').focus();
+    }
+
+    function addRegistro() {
+      const { usuario, registro, turno } = getUserInfo();
+      const setor = document.getElementById('setor').value.trim();
+      const veiculo = document.getElementById('veiculo').value.trim();
+      const observacoes = document.getElementById('obs').value.trim();
+
+      if (!turno) {
+        alert('Defina o turno fazendo login pelo index.html.');
+        return;
+      }
+      if (!usuario) {
+        alert('Usuário não identificado. Faça login pelo index.html.');
+        return;
+      }
+      if (!veiculo) {
+        alert('Informe o veículo (placa ou chassi).');
+        document.getElementById('veiculo').focus();
+        return;
+      }
+
+      const registroObj = {
+        setor,
+        turno,
+        controlador: \`\${usuario} / \${registro}\`,
+        veiculo,
+        observacoes,
+        dataHora: new Date().toLocaleString('pt-BR')
+      };
+
+      const arr = loadArr();
+      arr.push(registroObj);
+      saveArr(arr);
+      renderTable();
+      clearFields();
+    }
+
+    function deleteRegistro(index) {
+      const arr = loadArr();
+      if (index >= 0 && index < arr.length) {
+        arr.splice(index, 1);
+        saveArr(arr);
+        renderTable();
+      }
+    }
+
+    function renderTable() {
+      const arr = loadArr();
+      const tbody = document.querySelector('#tabela tbody');
+      tbody.innerHTML = '';
+
+      const empty = document.getElementById('listaVazia');
+      if (!arr.length) {
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+      }
+
+      arr.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = \`
+          <td>\${row.setor || ''}</td>
+          <td>\${row.turno || ''}</td>
+          <td>\${row.controlador || ''}</td>
+          <td>\${row.veiculo || ''}</td>
+          <td>\${row.observacoes || ''}</td>
+          <td>\${row.dataHora || ''}</td>
+          <td>
+            <button class="danger" onclick="deleteRegistro(\${idx})" title="Excluir">
+              <i data-feather="trash-2"></i> Excluir
+            </button>
+          </td>
+        \`;
+        tbody.appendChild(tr);
+      });
+
+      if (window.feather) feather.replace();
+    }
+
+    // Eventos
+    document.getElementById('btnAdd').addEventListener('click', addRegistro);
+    document.getElementById('btnClear').addEventListener('click', clearFields);
+
+    // Init
+    setUserBanner();
+    renderTable();
+    if (window.feather) feather.replace();
+  </script>
+</body>
+</html>
